@@ -1,4 +1,4 @@
-# ROSM ACCEL CONTROL
+# ROS ACCEL CONTROL
 
 roscore
 
