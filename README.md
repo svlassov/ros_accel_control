@@ -1,5 +1,5 @@
-# ROS ACCEL CONTROL alpha - 0.2.3
-
+# ROS ACCEL CONTROL
+## alpha - 0.2.3
 roscore
 
 roslaunch rosbridge_server rosbridge_websocket.launch port:=9099 address:=0.0.0.0 ssl:=true certfile:=/media/svyatoslav/LALALAND/ROS_WEB/SERVICE-BALANCE/conf.d/selfsigned.pem keyfile:=/media/svyatoslav/LALALAND/ROS_WEB/SERVICE-BALANCE/conf.d/selfsigned.key authenticate:=false --screen
