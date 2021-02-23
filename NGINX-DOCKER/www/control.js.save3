@@ -1,0 +1,168 @@
+//var server = "192.168.1.120";
+var server = "192.168.5.71";
+var port = "9099";
+var topic = "/cmd_vel";
+var msg = "geometry_msgs/Twist";
+var proto = "wss"
+
+var maxLin = 1.1;
+var maxAng = 2;
+
+var x = 0;
+var z = 0;
+
+// var con_info;
+
+var con;
+var msg_info_angular;
+var msg_info_linear;
+
+// window.onload = function () {
+//   // Check if is IOS 13 when page loads.
+//   if ( window.DeviceMotionEvent && typeof window.DeviceMotionEvent.requestPermission === 'function' ){
+//       // Everything here is just a lazy banner. You can do the banner your way.
+//       const banner = document.createElement('div')
+//       banner.innerHTML = `<div style="z-index: 1; position: absolute; width: 100%; background-color:#000; color: #fff"><p style="padding: 10px">Click here to enable DeviceMotion</p></div>`
+//       banner.onclick = ClickRequestDeviceMotionEvent // You NEED to bind the function into a onClick event. An artificial 'onClick' will NOT work.
+//       document.querySelector('body').appendChild(banner)
+//   }
+// }
+
+
+// function ClickRequestDeviceMotionEvent () {
+//   window.DeviceMotionEvent.requestPermission()
+//     .then(response => {
+//       if (response === 'granted') {
+//         window.addEventListener('devicemotion',
+//           () => { console.log('DeviceMotion permissions granted.') },
+//           (e) => { throw e }
+//       )} else {
+//         console.log('DeviceMotion permissions not granted.')
+//       }
+//     })
+//     .catch(e => {
+//       console.error(e)
+//     })
+// }
+
+//###############################################################################################
+//###############################################################################################
+//###############################################################################################
+
+function color(clr) {
+  document.body.innerHTML = '<style>body {background: '+clr+';}</style><div id=scr>err</div></style><div id=scp>err</div><button id="accelPermsButton" onclick="getAccel()" style="height:50px;">Get Accelerometer Permissions</button>';
+}
+
+function roundPlus(x, n) { //x - число, n - количество знаков
+  if(isNaN(x) || isNaN(n)) return false;
+  var m = Math.pow(10,n);
+  return Math.round(x*m)/m;
+}
+
+function getAccel(){
+    DeviceMotionEvent.requestPermission().then(response => {
+        if (response == 'granted') {
+// //
+//           var con = new ROSLIB.Ros({
+          con = new ROSLIB.Ros({
+              url : proto + '://' + server + ':' + port
+          });
+
+//          con_info = con;
+
+              con.on('close', function() {
+                  console.log('Connection to websocket server closed.');
+                  color('red');
+              });
+
+              con.on('error', function(error) {
+                  console.log('Error connecting to websocket server: ', error);
+                  color('yellow');
+              });
+
+              con.on('connection', function() {
+                  console.log('Connected to websocket server.');
+                  color('green');
+                  window.addEventListener('devicemotion',function(e) {
+                      var acc = [e.accelerationIncludingGravity.x,e.accelerationIncludingGravity.y];
+                      var maxima = [maxLin,maxAng];
+                      for (var i = 0; i < 2; i++) {
+                      if (Math.abs(acc[i]) < 2) {
+                          acc[i] = 0;
+                      } else {
+                          var sign = Math.abs(acc[i])/acc[i];
+                          if (i == 0) acc[i] -= sign*2;
+                          if (sign*acc[i] > 7) acc[i] = sign*7;
+                          acc[i] = maxima[i]*acc[i]/7;
+                      }
+                  }
+                  var cut = 3
+                  x = roundPlus(acc[0],cut)
+                  z = roundPlus(acc[1],cut)
+/////////////////////////////////////////////////////////////////////
+                  // var cmdVel = new ROSLIB.Topic({
+                  //     ros : con,
+                  //     name : topic,
+                  //     messageType : msg
+                  // });
+
+                  // var twist = new ROSLIB.Message({
+                  //     linear : {
+                  //         x : x,
+                  //         y : 0,
+                  //         z : 0
+                  //     },
+                  //     angular : {
+                  //         x : 0,
+                  //         y : 0,
+                  //         z : z
+                  //     }
+                  // });
+
+                  // setInterval(function() {
+                  //     var body_msg_linear = document.getElementById("scr");
+                  //     body_msg_linear.textContent = "Twist_MSG: linear.x="+twist.linear.x+"";
+                  //     var body_msg_angular = document.getElementById("scp");
+                  //     body_msg_angular.textContent = "Twist_MSG: angular.z="+twist.angular.z+"";
+                  //     cmdVel.publish(twist);
+                  // },250);
+///////////////////////////////////////////////////////////////////////////
+                 });
+              });
+          }
+    });
+}
+
+function main() {
+    setInterval(function() {
+
+        var cmdVel = new ROSLIB.Topic({
+            ros : con,
+            name : topic,
+            messageType : msg
+        });
+
+        var twist = new ROSLIB.Message({
+            linear : {
+                x : x,
+                y : 0,
+                z : 0
+            },
+            angular : {
+                x : 0,
+                y : 0,
+                z : z
+            }
+        });
+
+        msg_info_angular = twist.angular.z;
+        msg_info_linear = twist.linear.x;
+
+        var body_msg_linear = document.getElementById("scr");
+        body_msg_linear.textContent = "Twist_MSG: linear.x="+msg_info_linear;
+        var body_msg_angular = document.getElementById("scp");
+        body_msg_angular.textContent = "Twist_MSG: angular.z="+msg_info_angular;
+        cmdVel.publish(twist);
+
+    },100);
+}

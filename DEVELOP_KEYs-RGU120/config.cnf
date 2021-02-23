@@ -1,0 +1,17 @@
+[ req ]
+prompt             = no
+default_bits       = 4096
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+[ req_distinguished_name ]
+countryName                = EE
+localityName               = Tallinn
+organizationName           = MyProject
+commonName                 = 192.168.1.120
+[ req_ext ]
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost
+IP.1 = 192.168.1.120
+IP.2 = 127.0.0.1

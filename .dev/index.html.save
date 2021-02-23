@@ -1,0 +1,10 @@
+<!doctype>
+<html>
+<head>
+  <script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+  <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+  <script type="text/javascript" src="control.js"></script>
+</head>
+<body onload="main();">
+</body>
+</html>
