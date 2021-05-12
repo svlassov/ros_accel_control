@@ -9,7 +9,7 @@ services:
      - ./conf.d:/etc/nginx/conf.d
      - ./log:/var/log/nginx
      - ./www:/data/www
-     - ../DEVELOP_KEYs-home71:/mnt/DEVELOP_KEYs
+     - ../DEVELOP_KEYs-RGU120:/mnt/DEVELOP_KEYs
     networks:
      - net-ui
     logging:
